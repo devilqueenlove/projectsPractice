@@ -1,20 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 function App() {
   const [length, setLength] = useState(8);
   const [char, setChar] = useState(false);
   const [num, setNum] = useState(false);
   const [password, setPassword] = useState("");
+  const passwordRef = useRef();
 
   useEffect(() => {
     passwordGenerator();
-  }, [length, char, num]);
+  }, [length, char, num, setPassword]);
 
-  useCallback(() => {
-    passwordGenerator();
-  }, [length, char, num, password]);
-
-  function passwordGenerator() {
+  const passwordGenerator = useCallback(() => {
     let str = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
     if (char) {
       str += "!@#$%^&*(){}[];<>";
@@ -28,7 +25,12 @@ function App() {
       pass += word;
     }
     setPassword(pass);
-  }
+  }, [length, char, num, setPassword]);
+
+  const copyPassword = useCallback(() => {
+    passwordRef.current?.select();
+    window.navigator.clipboard.writeText(password);
+  }, [password]);
 
   return (
     <div>
@@ -40,7 +42,9 @@ function App() {
           id="password"
           value={password}
           readOnly
+          ref={passwordRef}
         />
+        <button onClick={copyPassword}>Copy</button>
       </div>
       <div>
         <input
